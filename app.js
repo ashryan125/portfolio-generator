@@ -1,18 +1,9 @@
 const inquirer = require('inquirer');
 
-// const fs = require('fs');
-// const generatePage = require('./src/page-template.js')
+const generatePage = require('./src/page-template.js')
 
-// const pageHTML = generatePage(name, github);
+const { writeFile, copyFile } = require('./utils/generate-site.js');
 
-// const [name, github] = profileDataArgs;
-
-
-// fs.writeFile('./index.html', pageHTML, err => {
-//     if (err) throw new Error(err);
-
-//     console.log('Portfolio complete! Check out index.html to see the output!');
-// });
 
 const promptUser = () => {
     return inquirer.prompt([
@@ -24,7 +15,7 @@ const promptUser = () => {
                 if (nameInput) {
                     return true;
                 } else {
-                    console.log('Please enter your name! (Required)');
+                    console.log('Please enter your name!');
                     return false;
                 }
             }
@@ -37,7 +28,7 @@ const promptUser = () => {
                 if (nameInput) {
                     return true;
                 } else {
-                    console.log('Please enter your Github username! (Required)');
+                    console.log('Please enter your Github username!');
                     return false;
                 }
             }
@@ -84,7 +75,7 @@ Add a New Project
                 if (nameInput) {
                     return true;
                 } else {
-                    console.log('Please enter your project name! (Required)');
+                    console.log('Please enter your project name!');
                     return false;
                 }
             }
@@ -97,7 +88,7 @@ Add a New Project
                 if (nameInput) {
                     return true;
                 } else {
-                    console.log('Please enter your project description! (Required)');
+                    console.log('Please enter your project description!');
                     return false;
                 }
             }
@@ -116,7 +107,7 @@ Add a New Project
                 if (nameInput) {
                     return true;
                 } else {
-                    console.log('Please enter your Github link! (Required)');
+                    console.log('Please enter your Github link!');
                     return false;
                 }
             }
@@ -125,7 +116,7 @@ Add a New Project
             type: 'confirm',
             name: 'feature',
             message: 'Would you like to feature this project?',
-            default: false 
+            default: false
         },
         {
             type: 'confirm',
@@ -134,18 +125,32 @@ Add a New Project
             default: false
         }
     ])
-    .then(projectData => {
-        portfolioData.projects.push(projectData);
-        if (projectData.confirmAddProject) {
-            return promptProject(portfolioData);
-        } else {
-            return portfolioData;
-        }
-    });
+        .then(projectData => {
+            portfolioData.projects.push(projectData);
+            if (projectData.confirmAddProject) {
+                return promptProject(portfolioData);
+            } else {
+                return portfolioData;
+            }
+        });
 };
 
 promptUser()
     .then(promptProject)
     .then(portfolioData => {
-        console.log(portfolioData);
+        return generatePage(portfolioData);
+    })
+    .then(pageHTML => {
+        return writeFile(pageHTML);
+    })
+    .then(writeFileResponse => {
+        console.log(writeFileResponse);
+        return copyFile();
+    })
+    .then(copyFileResponse => {
+        console.log(copyFileResponse);
+    })
+    .catch(err => {
+        console.log(err);
     });
+
